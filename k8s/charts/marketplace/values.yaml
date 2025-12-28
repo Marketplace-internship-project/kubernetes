@@ -25,19 +25,19 @@ order-service:
   image:
     repository: ghcr.io/marketplace-internship-project/order-service
     tag: latest
-  livenessProbe:
-    httpGet:
-      path: /api/actuator/health/liveness
-      port: 8080
-    initialDelaySeconds: 300  
-    periodSeconds: 20
+  # livenessProbe:
+  #   httpGet:
+  #     path: /api/actuator/health/liveness
+  #     port: 8080
+  #   initialDelaySeconds: 300  
+  #   periodSeconds: 20
   
-  readinessProbe:
-    httpGet:
-      path: /api/actuator/health/readiness
-      port: 8080
-    initialDelaySeconds: 300  
-    periodSeconds: 20
+  # readinessProbe:
+  #   httpGet:
+  #     path: /api/actuator/health/readiness
+  #     port: 8080
+  #   initialDelaySeconds: 300  
+  #   periodSeconds: 20
 
   resources:
     requests:
@@ -78,19 +78,19 @@ user-service:
       cpu: 600m
       memory: 512Mi
 
-  livenessProbe:
-    httpGet:
-      path: /api/actuator/health/liveness
-      port: 8080
-    initialDelaySeconds: 300  
-    periodSeconds: 20
+  # livenessProbe:
+  #   httpGet:
+  #     path: /api/actuator/health/liveness
+  #     port: 8080
+  #   initialDelaySeconds: 300  
+  #   periodSeconds: 20
   
-  readinessProbe:
-    httpGet:
-      path: /api/actuator/health/readiness
-      port: 8080
-    initialDelaySeconds: 300  
-    periodSeconds: 20
+  # readinessProbe:
+  #   httpGet:
+  #     path: /api/actuator/health/readiness
+  #     port: 8080
+  #   initialDelaySeconds: 300  
+  #   periodSeconds: 20
   env:
     JAVA_TOOL_OPTIONS: "-Xmx200m -Xms200m"
     SPRING_DATASOURCE_URL: "jdbc:postgresql://marketplace-infrastructure-postgres:5432/user_db"
@@ -123,14 +123,14 @@ api-gateway:
   service:
     type: ClusterIP
     port: 8080
-  livenessProbe:
-    httpGet:
-      path: /actuator/health/liveness
-      port: 8080
-  readinessProbe:
-    httpGet:
-      path: /actuator/health/readiness
-      port: 8080
+  # livenessProbe:
+  #   httpGet:
+  #     path: /actuator/health/liveness
+  #     port: 8080
+  # readinessProbe:
+  #   httpGet:
+  #     path: /actuator/health/readiness
+  #     port: 8080
   env:
     JAVA_TOOL_OPTIONS: "-Xmx200m -Xms200m"
     AUTH_SERVICE_URL: "http://marketplace-auth-service:8080"
@@ -170,12 +170,12 @@ infrastructure-kafka:
         memory: 300Mi
         cpu: 100m
 
-    livenessProbe:
-      initialDelaySeconds: 180
-      periodSeconds: 20
-    readinessProbe:
-      initialDelaySeconds: 180
-      periodSeconds: 20
+    # livenessProbe:
+    #   initialDelaySeconds: 180
+    #   periodSeconds: 20
+    # readinessProbe:
+    #   initialDelaySeconds: 180
+    #   periodSeconds: 20
 
   broker:
     replicaCount: 1
@@ -196,13 +196,13 @@ infrastructure-kafka:
         memory: 256Mi
         cpu: 100m
 
-    livenessProbe:
-      initialDelaySeconds: 180
-      periodSeconds: 20
-      failureThreshold: 6
-    readinessProbe:
-      initialDelaySeconds: 180
-      periodSeconds: 20
+    # livenessProbe:
+    #   initialDelaySeconds: 180
+    #   periodSeconds: 20
+    #   failureThreshold: 6
+    # readinessProbe:
+    #   initialDelaySeconds: 180
+    #   periodSeconds: 20
 
 infrastructure-postgres:
   image:
@@ -218,13 +218,13 @@ infrastructure-postgres:
           CREATE DATABASE auth_db;
           CREATE DATABASE user_db;
           CREATE DATABASE order_db;
-    livenessProbe:
-      initialDelaySeconds: 180
-      periodSeconds: 20
-      failureThreshold: 6
-    readinessProbe:
-      initialDelaySeconds: 180
-      periodSeconds: 20
+    # livenessProbe:
+    #   initialDelaySeconds: 180
+    #   periodSeconds: 20
+    #   failureThreshold: 6
+    # readinessProbe:
+    #   initialDelaySeconds: 180
+    #   periodSeconds: 20
 
 infrastructure-mongo:
   image:
@@ -232,15 +232,15 @@ infrastructure-mongo:
     repository: bitnamilegacy/mongodb
   auth:
     enabled: false
-  livenessProbe:
-    initialDelaySeconds: 180
-    periodSeconds: 20
-    timeoutSeconds: 10
-    failureThreshold: 6
-  readinessProbe:
-    initialDelaySeconds: 180
-    periodSeconds: 20
-    timeoutSeconds: 10
+  # livenessProbe:
+  #   initialDelaySeconds: 180
+  #   periodSeconds: 20
+  #   timeoutSeconds: 10
+  #   failureThreshold: 6
+  # readinessProbe:
+  #   initialDelaySeconds: 180
+  #   periodSeconds: 20
+  #   timeoutSeconds: 10
 
 infrastructure-redis:
   image:
@@ -250,10 +250,10 @@ infrastructure-redis:
     enabled: false
   architecture: standalone
   master:
-    livenessProbe:
-      initialDelaySeconds: 120
-      periodSeconds: 20
-      failureThreshold: 6
-    readinessProbe:
-      initialDelaySeconds: 120
-      periodSeconds: 20
+    # livenessProbe:
+    #   initialDelaySeconds: 120
+    #   periodSeconds: 20
+    #   failureThreshold: 6
+    # readinessProbe:
+    #   initialDelaySeconds: 120
+    #   periodSeconds: 20

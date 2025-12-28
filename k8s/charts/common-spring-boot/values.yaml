@@ -19,16 +19,16 @@ env:
   MANAGMENT_ENDPOINTS_WEB_EXPOSURE_INCLUDE:"health,info,mappings"
 
 
-livenessProbe:
-  httpGet:
-    path: /api/actuator/health/liveness
-    port: 8080
-  initialDelaySeconds: 240
-  periodSeconds: 20
+# livenessProbe:
+#   httpGet:
+#     path: /api/actuator/health/liveness
+#     port: 8080
+#   initialDelaySeconds: 240
+#   periodSeconds: 20
 
-readinessProbe:
-  httpGet:
-    path: /api/actuator/health/readiness
-    port: 8080
-  initialDelaySeconds: 240
-  periodSeconds: 20
+# readinessProbe:
+#   httpGet:
+#     path: /api/actuator/health/readiness
+#     port: 8080
+#   initialDelaySeconds: 240
+#   periodSeconds: 20
