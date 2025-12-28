@@ -1,0 +1,259 @@
+---
+global:
+  springProfile: "docker"
+  imagePullSecrets:
+    - name: ghcr-secret
+
+payment-service:
+  replicaCount: 0
+  fullnameOverride: "marketplace-payment-service"
+  image:
+    repository: ghcr.io/marketplace-internship-project/payment-service
+    tag: latest
+    pullPolicy: IfNotPresent
+  env:
+    JAVA_TOOL_OPTIONS: "-Xmx200m -Xms200m"
+    SPRING_KAFKA_BOOTSTRAP_SERVERS: "marketplace-infrastructure-kafka:9092"
+    SPRING_DATA_MONGODB_URI: "mongodb://marketplace-infrastructure-mongo:27017/payment_db"
+    EXTERNAL_BANK_API: "http://www.randomnumberapi.com/api/v1.0/random?min=1&max=100&count=1"
+    JWT_ACCESS_SECRET: "AFRpbjILk+NiHAXU95mFVTmPZAm8iFNL3eT9XmK4D5I="
+    SPRING_AUTOCONFIGURE_EXCLUDE: "org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration,org.springframework.boot.autoconfigure.orm.jpa.HibernateJpaAutoConfiguration"
+
+order-service:
+  replicaCount: 0
+  fullnameOverride: "marketplace-order-service"
+  image:
+    repository: ghcr.io/marketplace-internship-project/order-service
+    tag: latest
+  livenessProbe:
+    httpGet:
+      path: /api/actuator/health/liveness
+      port: 8080
+    initialDelaySeconds: 300  
+    periodSeconds: 20
+  
+  readinessProbe:
+    httpGet:
+      path: /api/actuator/health/readiness
+      port: 8080
+    initialDelaySeconds: 300  
+    periodSeconds: 20
+
+  resources:
+    requests:
+      cpu: 100m
+      memory: 300Mi  
+    limits:
+      cpu: 800m      
+      memory: 768Mi
+  env:
+    JAVA_TOOL_OPTIONS: "-Xmx350m -Xms350m -XX:+UseSerialGC"
+    SERVER_TOMCAT_THREADS_MAX: "20"
+    SERVER_TOMCAT_THREADS_MIN_SPARE: "5"
+    SPRING_JPA_OPEN_IN_VIEW: "false" 
+    SPRING_DATASOURCE_URL: "jdbc:postgresql://marketplace-infrastructure-postgres:5432/order_db"
+    SPRING_DATASOURCE_USERNAME: "postgres"
+    SPRING_DATASOURCE_PASSWORD: "adminpassword"
+    SPRING_DATA_REDIS_HOST: "marketplace-infrastructure-redis-master"
+    SPRING_DATA_REDIS_PORT: "6379"
+    JWT_ACCESS_SECRET: "AFRpbjILk+NiHAXU95mFVTmPZAm8iFNL3eT9XmK4D5I="
+    APPLICATION_CONFIG_USER_URL: "http://marketplace-user-service:8080"
+    SPRING_KAFKA_BOOTSTRAP_SERVERS: "marketplace-infrastructure-kafka:9092"
+    SPRING_KAFKA_PRODUCER_PROPERTIES_BUFFER_MEMORY: "1048576" 
+    SPRING_KAFKA_PRODUCER_PROPERTIES_BATCH_SIZE: "4096"
+    SPRING_KAFKA_PRODUCER_PROPERTIES_REQUEST_TIMEOUT_MS: "5000"
+    SPRING_KAFKA_PRODUCER_RETRIES: "3"
+
+user-service:
+  replicaCount: 0
+  fullnameOverride: "marketplace-user-service"
+  image:
+    repository: ghcr.io/marketplace-internship-project/user-service
+    tag: latest
+  resources:
+    requests:
+      cpu: 250m    
+      memory: 256Mi
+    limits:
+      cpu: 600m
+      memory: 512Mi
+
+  livenessProbe:
+    httpGet:
+      path: /api/actuator/health/liveness
+      port: 8080
+    initialDelaySeconds: 300  
+    periodSeconds: 20
+  
+  readinessProbe:
+    httpGet:
+      path: /api/actuator/health/readiness
+      port: 8080
+    initialDelaySeconds: 300  
+    periodSeconds: 20
+  env:
+    JAVA_TOOL_OPTIONS: "-Xmx200m -Xms200m"
+    SPRING_DATASOURCE_URL: "jdbc:postgresql://marketplace-infrastructure-postgres:5432/user_db"
+    SPRING_DATASOURCE_USERNAME: "postgres"
+    SPRING_DATASOURCE_PASSWORD: "adminpassword"
+    SPRING_DATA_REDIS_HOST: "marketplace-infrastructure-redis-master"
+    SPRING_DATA_REDIS_PORT: "6379"
+    JWT_ACCESS_SECRET: "AFRpbjILk+NiHAXU95mFVTmPZAm8iFNL3eT9XmK4D5I="
+
+auth-service:
+  replicaCount: 0
+  fullnameOverride: "marketplace-auth-service"
+  image:
+    repository: ghcr.io/marketplace-internship-project/authentication-service
+    tag: latest
+  env:
+    JAVA_TOOL_OPTIONS: "-Xmx200m -Xms200m"
+    SPRING_DATASOURCE_URL: "jdbc:postgresql://marketplace-infrastructure-postgres:5432/auth_db"
+    SPRING_DATASOURCE_USERNAME: "postgres"
+    SPRING_DATASOURCE_PASSWORD: "adminpassword"
+    JWT_ACCESS_SECRET: "AFRpbjILk+NiHAXU95mFVTmPZAm8iFNL3eT9XmK4D5I="
+    JWT_REFRESH_SECRET: "UklzSGNvbnRlbnQiLCJkYXRhIjoiZGVhZGJlZWYifQ=="
+
+api-gateway:
+  replicaCount: 0
+  fullnameOverride: "marketplace-api-gateway"
+  image:
+    repository: ghcr.io/marketplace-internship-project/api-gateway
+    tag: latest
+  service:
+    type: ClusterIP
+    port: 8080
+  livenessProbe:
+    httpGet:
+      path: /actuator/health/liveness
+      port: 8080
+  readinessProbe:
+    httpGet:
+      path: /actuator/health/readiness
+      port: 8080
+  env:
+    JAVA_TOOL_OPTIONS: "-Xmx200m -Xms200m"
+    AUTH_SERVICE_URL: "http://marketplace-auth-service:8080"
+    USER_SERVICE_URL: "http://marketplace-user-service:8080"
+    ORDER_SERVICE_URL: "http://marketplace-order-service:8080"
+    PAYMENT_SERVICE_URL: "http://marketplace-payment-service:8080"
+    JWT_ACCESS_SECRET: "AFRpbjILk+NiHAXU95mFVTmPZAm8iFNL3eT9XmK4D5I="
+
+infrastructure-kafka:
+  image:
+    registry: docker.io
+    repository: bitnamilegacy/kafka
+  commonConfiguration: |-
+    auto.create.topics.enable=true
+    default.replication.factor=1
+    min.insync.replicas=1
+    
+  zookeeper:
+    enabled: false
+  kraft:
+    enabled: true
+  listeners:
+    client:
+      protocol: PLAINTEXT
+    interbroker:
+      protocol: PLAINTEXT
+    controller:
+      protocol: PLAINTEXT
+
+  controller:
+    replicaCount: 1
+    heapOpts: "-Xmx256m -Xms256m"
+    resources:
+      limits:
+        memory: 600Mi
+      requests:
+        memory: 300Mi
+        cpu: 100m
+
+    livenessProbe:
+      initialDelaySeconds: 180
+      periodSeconds: 20
+    readinessProbe:
+      initialDelaySeconds: 180
+      periodSeconds: 20
+
+  broker:
+    replicaCount: 1
+    extraEnvVars:
+      - name: KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR
+        value: "1"
+      - name: KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR
+        value: "1"
+      - name: KAFKA_TRANSACTION_STATE_LOG_MIN_ISR
+        value: "1"
+      - name: KAFKA_MIN_INSYNC_REPLICAS
+        value: "1"
+    heapOpts: "-Xmx256m -Xms256m"
+    resources:
+      limits:
+        memory: 512Mi
+      requests:
+        memory: 256Mi
+        cpu: 100m
+
+    livenessProbe:
+      initialDelaySeconds: 180
+      periodSeconds: 20
+      failureThreshold: 6
+    readinessProbe:
+      initialDelaySeconds: 180
+      periodSeconds: 20
+
+infrastructure-postgres:
+  image:
+    registry: docker.io
+    repository: bitnamilegacy/postgresql
+  auth:
+    postgresPassword: "adminpassword"
+    username: "postgres"
+  primary:
+    initdb:
+      scripts:
+        init.sql: |
+          CREATE DATABASE auth_db;
+          CREATE DATABASE user_db;
+          CREATE DATABASE order_db;
+    livenessProbe:
+      initialDelaySeconds: 180
+      periodSeconds: 20
+      failureThreshold: 6
+    readinessProbe:
+      initialDelaySeconds: 180
+      periodSeconds: 20
+
+infrastructure-mongo:
+  image:
+    registry: docker.io
+    repository: bitnamilegacy/mongodb
+  auth:
+    enabled: false
+  livenessProbe:
+    initialDelaySeconds: 180
+    periodSeconds: 20
+    timeoutSeconds: 10
+    failureThreshold: 6
+  readinessProbe:
+    initialDelaySeconds: 180
+    periodSeconds: 20
+    timeoutSeconds: 10
+
+infrastructure-redis:
+  image:
+    registry: docker.io
+    repository: bitnamilegacy/redis
+  auth:
+    enabled: false
+  architecture: standalone
+  master:
+    livenessProbe:
+      initialDelaySeconds: 120
+      periodSeconds: 20
+      failureThreshold: 6
+    readinessProbe:
+      initialDelaySeconds: 120
+      periodSeconds: 20
