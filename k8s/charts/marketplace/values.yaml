@@ -5,12 +5,10 @@ global:
     - name: ghcr-secret
 
 payment-service:
-  replicaCount: 0
   fullnameOverride: "marketplace-payment-service"
   image:
     repository: ghcr.io/marketplace-internship-project/payment-service
     tag: latest
-    pullPolicy: IfNotPresent
   env:
     JAVA_TOOL_OPTIONS: "-Xmx200m -Xms200m"
     SPRING_KAFKA_BOOTSTRAP_SERVERS: "marketplace-infrastructure-kafka:9092"
@@ -20,24 +18,23 @@ payment-service:
     SPRING_AUTOCONFIGURE_EXCLUDE: "org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration,org.springframework.boot.autoconfigure.orm.jpa.HibernateJpaAutoConfiguration"
 
 order-service:
-  replicaCount: 0
   fullnameOverride: "marketplace-order-service"
   image:
     repository: ghcr.io/marketplace-internship-project/order-service
     tag: latest
-  # livenessProbe:
-  #   httpGet:
-  #     path: /api/actuator/health/liveness
-  #     port: 8080
-  #   initialDelaySeconds: 300  
-  #   periodSeconds: 20
+  livenessProbe:
+    httpGet:
+      path: /api/actuator/health/liveness
+      port: 8080
+    initialDelaySeconds: 300  
+    periodSeconds: 20
   
-  # readinessProbe:
-  #   httpGet:
-  #     path: /api/actuator/health/readiness
-  #     port: 8080
-  #   initialDelaySeconds: 300  
-  #   periodSeconds: 20
+  readinessProbe:
+    httpGet:
+      path: /api/actuator/health/readiness
+      port: 8080
+    initialDelaySeconds: 300  
+    periodSeconds: 20
 
   resources:
     requests:
@@ -65,7 +62,6 @@ order-service:
     SPRING_KAFKA_PRODUCER_RETRIES: "3"
 
 user-service:
-  replicaCount: 0
   fullnameOverride: "marketplace-user-service"
   image:
     repository: ghcr.io/marketplace-internship-project/user-service
@@ -78,19 +74,19 @@ user-service:
       cpu: 600m
       memory: 512Mi
 
-  # livenessProbe:
-  #   httpGet:
-  #     path: /api/actuator/health/liveness
-  #     port: 8080
-  #   initialDelaySeconds: 300  
-  #   periodSeconds: 20
+  livenessProbe:
+    httpGet:
+      path: /api/actuator/health/liveness
+      port: 8080
+    initialDelaySeconds: 300  
+    periodSeconds: 20
   
-  # readinessProbe:
-  #   httpGet:
-  #     path: /api/actuator/health/readiness
-  #     port: 8080
-  #   initialDelaySeconds: 300  
-  #   periodSeconds: 20
+  readinessProbe:
+    httpGet:
+      path: /api/actuator/health/readiness
+      port: 8080
+    initialDelaySeconds: 300  
+    periodSeconds: 20
   env:
     JAVA_TOOL_OPTIONS: "-Xmx200m -Xms200m"
     SPRING_DATASOURCE_URL: "jdbc:postgresql://marketplace-infrastructure-postgres:5432/user_db"
@@ -101,7 +97,6 @@ user-service:
     JWT_ACCESS_SECRET: "AFRpbjILk+NiHAXU95mFVTmPZAm8iFNL3eT9XmK4D5I="
 
 auth-service:
-  replicaCount: 0
   fullnameOverride: "marketplace-auth-service"
   image:
     repository: ghcr.io/marketplace-internship-project/authentication-service
@@ -115,7 +110,6 @@ auth-service:
     JWT_REFRESH_SECRET: "UklzSGNvbnRlbnQiLCJkYXRhIjoiZGVhZGJlZWYifQ=="
 
 api-gateway:
-  replicaCount: 0
   fullnameOverride: "marketplace-api-gateway"
   image:
     repository: ghcr.io/marketplace-internship-project/api-gateway
@@ -123,14 +117,14 @@ api-gateway:
   service:
     type: ClusterIP
     port: 8080
-  # livenessProbe:
-  #   httpGet:
-  #     path: /actuator/health/liveness
-  #     port: 8080
-  # readinessProbe:
-  #   httpGet:
-  #     path: /actuator/health/readiness
-  #     port: 8080
+  livenessProbe:
+    httpGet:
+      path: /actuator/health/liveness
+      port: 8080
+  readinessProbe:
+    httpGet:
+      path: /actuator/health/readiness
+      port: 8080
   env:
     JAVA_TOOL_OPTIONS: "-Xmx200m -Xms200m"
     AUTH_SERVICE_URL: "http://marketplace-auth-service:8080"
@@ -170,12 +164,12 @@ infrastructure-kafka:
         memory: 300Mi
         cpu: 100m
 
-    # livenessProbe:
-    #   initialDelaySeconds: 180
-    #   periodSeconds: 20
-    # readinessProbe:
-    #   initialDelaySeconds: 180
-    #   periodSeconds: 20
+    livenessProbe:
+      initialDelaySeconds: 180
+      periodSeconds: 20
+    readinessProbe:
+      initialDelaySeconds: 180
+      periodSeconds: 20
 
   broker:
     replicaCount: 1
@@ -196,13 +190,13 @@ infrastructure-kafka:
         memory: 256Mi
         cpu: 100m
 
-    # livenessProbe:
-    #   initialDelaySeconds: 180
-    #   periodSeconds: 20
-    #   failureThreshold: 6
-    # readinessProbe:
-    #   initialDelaySeconds: 180
-    #   periodSeconds: 20
+    livenessProbe:
+      initialDelaySeconds: 180
+      periodSeconds: 20
+      failureThreshold: 6
+    readinessProbe:
+      initialDelaySeconds: 180
+      periodSeconds: 20
 
 infrastructure-postgres:
   image:
@@ -212,19 +206,26 @@ infrastructure-postgres:
     postgresPassword: "adminpassword"
     username: "postgres"
   primary:
+    resources:
+      requests:
+        cpu: 100m
+        memory: 256Mi
+      limits:
+        cpu: 500m
+        memory: 512Mi
     initdb:
       scripts:
         init.sql: |
           CREATE DATABASE auth_db;
           CREATE DATABASE user_db;
           CREATE DATABASE order_db;
-    # livenessProbe:
-    #   initialDelaySeconds: 180
-    #   periodSeconds: 20
-    #   failureThreshold: 6
-    # readinessProbe:
-    #   initialDelaySeconds: 180
-    #   periodSeconds: 20
+    livenessProbe:
+      initialDelaySeconds: 180
+      periodSeconds: 20
+      failureThreshold: 6
+    readinessProbe:
+      initialDelaySeconds: 180
+      periodSeconds: 20
 
 infrastructure-mongo:
   image:
@@ -232,15 +233,22 @@ infrastructure-mongo:
     repository: bitnamilegacy/mongodb
   auth:
     enabled: false
-  # livenessProbe:
-  #   initialDelaySeconds: 180
-  #   periodSeconds: 20
-  #   timeoutSeconds: 10
-  #   failureThreshold: 6
-  # readinessProbe:
-  #   initialDelaySeconds: 180
-  #   periodSeconds: 20
-  #   timeoutSeconds: 10
+  resources:
+    requests:
+      cpu: 100m
+      memory: 256Mi
+    limits:
+      cpu: 500m
+      memory: 512Mi
+  livenessProbe:
+    initialDelaySeconds: 180
+    periodSeconds: 20
+    timeoutSeconds: 10
+    failureThreshold: 6
+  readinessProbe:
+    initialDelaySeconds: 180
+    periodSeconds: 20
+    timeoutSeconds: 10
 
 infrastructure-redis:
   image:
@@ -250,10 +258,17 @@ infrastructure-redis:
     enabled: false
   architecture: standalone
   master:
-    # livenessProbe:
-    #   initialDelaySeconds: 120
-    #   periodSeconds: 20
-    #   failureThreshold: 6
-    # readinessProbe:
-    #   initialDelaySeconds: 120
-    #   periodSeconds: 20
+    resources:
+      requests:
+        cpu: 50m
+        memory: 64Mi
+      limits:
+        cpu: 200m
+        memory: 128Mi
+    livenessProbe:
+      initialDelaySeconds: 120
+      periodSeconds: 20
+      failureThreshold: 6
+    readinessProbe:
+      initialDelaySeconds: 120
+      periodSeconds: 20
