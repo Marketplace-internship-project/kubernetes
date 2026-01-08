@@ -1,0 +1,55 @@
+apiVersion: v2
+name: marketplace
+description: Main Umbrella Chart for Marketplace App
+type: application
+version: 0.1.0
+appVersion: "1.0.0"
+
+dependencies:
+  - name: common-spring-boot
+    version: 0.1.0
+    repository: "file://../common-spring-boot"
+    alias: payment-service
+
+  - name: common-spring-boot
+    version: 0.1.0
+    repository: "file://../common-spring-boot"
+    alias: order-service
+
+  - name: common-spring-boot
+    version: 0.1.0
+    repository: "file://../common-spring-boot"
+    alias: user-service
+
+  - name: common-spring-boot
+    version: 0.1.0
+    repository: "file://../common-spring-boot"
+    alias: auth-service
+
+  - name: common-spring-boot
+    version: 0.1.0
+    repository: "file://../common-spring-boot"
+    alias: api-gateway
+
+
+#------------- Storages -------------------------
+
+  - name: postgresql
+    version: 13.2.24 
+    repository: oci://registry-1.docker.io/bitnamicharts
+    alias: infrastructure-postgres
+
+  - name: mongodb
+    version: 14.2.3
+    repository: oci://registry-1.docker.io/bitnamicharts
+    alias: infrastructure-mongo
+
+  - name: redis
+    version: 18.6.1
+    repository: oci://registry-1.docker.io/bitnamicharts
+    alias: infrastructure-redis
+
+  - name: kafka
+    version: 26.8.3
+    repository: oci://registry-1.docker.io/bitnamicharts
+    alias: infrastructure-kafka

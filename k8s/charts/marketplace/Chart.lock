@@ -1,0 +1,30 @@
+dependencies:
+- name: common-spring-boot
+  repository: file://../common-spring-boot
+  version: 0.1.0
+- name: common-spring-boot
+  repository: file://../common-spring-boot
+  version: 0.1.0
+- name: common-spring-boot
+  repository: file://../common-spring-boot
+  version: 0.1.0
+- name: common-spring-boot
+  repository: file://../common-spring-boot
+  version: 0.1.0
+- name: common-spring-boot
+  repository: file://../common-spring-boot
+  version: 0.1.0
+- name: postgresql
+  repository: oci://registry-1.docker.io/bitnamicharts
+  version: 13.2.24
+- name: mongodb
+  repository: oci://registry-1.docker.io/bitnamicharts
+  version: 14.2.3
+- name: redis
+  repository: oci://registry-1.docker.io/bitnamicharts
+  version: 18.6.1
+- name: kafka
+  repository: oci://registry-1.docker.io/bitnamicharts
+  version: 26.8.3
+digest: sha256:75f51544fdaf227d363cae5436618ff414087aefda79e7aa0549e70ad23f1ed6
+generated: "2025-12-27T15:49:52.7780823+03:00"
